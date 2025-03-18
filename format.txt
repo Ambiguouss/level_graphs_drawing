@@ -1,0 +1,15 @@
+#only works for proper level graphs
+3 #number of levels
+5 5 2 #numbers of verticles on each levels
+6 #number of edges between lvl 1 and 2
+1 1 #edge between verticle 1 on lvl1 and verticle 1 on lvl2 
+2 2 #edge between verticle 2 on lvl1 and verticle 2 on lvl2 
+2 3
+3 4
+4 5
+5 5
+4 #number of edges between lvl 2 and 3
+1 1
+2 1
+3 2
+4 2
