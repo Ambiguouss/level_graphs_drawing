@@ -1,6 +1,7 @@
 #include "graph.cpp"
 
-void Graph::draw(string filename=""){
+template <typename LevelType, typename VertexType>
+void GraphBase<LevelType,VertexType>::draw(string filename){
     if(filename==""){
         filename="images/test.tex";
         return;
@@ -12,7 +13,6 @@ void Graph::draw(string filename=""){
         return;
     }
 
-    // Start the TikZ picture
     outFile << "\\documentclass{article}\n";
     outFile << "\\usepackage{tikz}\n";
     outFile << "\\usepackage{adjustbox}\n";
@@ -40,21 +40,8 @@ void Graph::draw(string filename=""){
                 outFile << "\\draw (" << v<< ") -- (" 
                 << x<< ");\n";
             }
-            //outFile << "\\node[draw, circle] (" <<v  << ") at (" 
-                //<< i << "," << -lvl
-                //<< ") {" << v->label << "};\n";
         }
     }
-    // Draw edges
-    /*for (auto level_edges : edges) {
-        for(auto edge : level_edges->edges){
-            outFile << "\\draw (" << edge->get_top()<< ") -- (" 
-            << edge->get_bot()<< ");\n";
-
-        }
-    }*/
-
-    // End TikZ picture
     outFile << "\\end{tikzpicture}%\n}\n";
     outFile << "\\end{document}\n";
 

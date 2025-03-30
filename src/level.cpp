@@ -24,3 +24,9 @@ struct Level{
     }
 
 };
+
+struct ExtraLevel : Level{
+    Level* original_level;
+    Vertex* original_vertex;
+    ExtraLevel(Level* origin,Vertex* origin_v):Level(),original_level(origin),original_vertex(origin_v){};
+};
