@@ -2,28 +2,10 @@
 #pragma once
 #include "vertex.cpp"
 #include "level.cpp"
+#include "sat_system.hpp"
+#include "graph.hpp"
 
 using namespace std;
-
-template <typename LevelType, typename VertexType>
-struct GraphBase{
-    vector<LevelType*> levels;
-
-    LevelType* get_level(int k);
-    void create_edge(int top_level,int top_k,int bot_k);
-    void create_edge(VertexType* v1,VertexType* v2);
-    LevelType* create_level();
-    GraphBase<ExtraLevel,ExtraVertex> split_verticles();
-    ~GraphBase(){
-        for(auto x:levels){
-            delete x;
-        }
-    }
-
-    void draw(string filename="");
-    template <typename L, typename V>
-    friend GraphBase<L,V> input_graph();
-};
 
 
 template <typename LevelType, typename VertexType>
@@ -92,9 +74,16 @@ GraphBase<ExtraLevel,ExtraVertex> GraphBase<LevelType,VertexType>::split_verticl
                 new_graph.create_edge(prev,new_vertex);
                 it=active_edge.erase(it);
             }else{
-                ExtraVertex* edge_vertex = new ExtraVertex(prev->label,lvl_cnt,original_vertex);
+                Vertex* to_be_origin;
+                if(original_vertex->level==curr->level){
+                    to_be_origin=curr;
+                }else{
+                    to_be_origin=prev->original;
+                }
+                ExtraVertex* edge_vertex = new ExtraVertex(prev->label,lvl_cnt,to_be_origin);
                 new_graph.create_edge(prev,edge_vertex);
                 new_lvl->add_vertex(edge_vertex);
+                cout<<"done ";
                 prev = edge_vertex;
                 ++it;
             }
@@ -103,8 +92,11 @@ GraphBase<ExtraLevel,ExtraVertex> GraphBase<LevelType,VertexType>::split_verticl
     };
     
     for(auto lvl:levels){
+        cout<<"a\n";
         for(int i=0;i<lvl->verticles.size();i++){
+            
             auto vertex=lvl->verticles[i];
+            cout<<vertex->label<<' ';
 
             ExtraLevel* new_lvl = new ExtraLevel(lvl,vertex);
             new_graph.levels.push_back(new_lvl);
@@ -133,6 +125,18 @@ GraphBase<ExtraLevel,ExtraVertex> GraphBase<LevelType,VertexType>::split_verticl
             lvl_cnt++;
         }
     }
+
+    for(auto lvl:new_graph.levels){
+        cout<<lvl->verticles.size()<<'\n';
+    }
+
+    for(auto lvl:new_graph.levels){
+        for(int i=0;i<lvl->verticles.size();i++){
+            cout<<lvl->get_vertex(i+1)->label<<' ';
+        }
+        cout<<'\n';
+    }
+
     return new_graph;
 }
 

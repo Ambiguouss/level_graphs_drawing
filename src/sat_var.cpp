@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 #pragma once
 using namespace std;
-#include "graph.cpp"
+#include "vertex.cpp"
 
 struct Sat_var{
     Vertex* first;

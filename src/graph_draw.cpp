@@ -1,7 +1,20 @@
+#pragma once
 #include "graph.cpp"
 
 template <typename LevelType, typename VertexType>
 void GraphBase<LevelType,VertexType>::draw(string filename){
+
+    for(auto lvl:levels){
+        cout<<lvl->verticles.size()<<'\n';
+    }
+
+    for(auto lvl:levels){
+        for(int i=0;i<lvl->verticles.size();i++){
+            cout<<lvl->get_vertex(i+1)->label<<' ';
+        }
+        cout<<'\n';
+    }
+
     if(filename==""){
         filename="images/test.tex";
         return;
@@ -23,19 +36,25 @@ void GraphBase<LevelType,VertexType>::draw(string filename){
 
 
     for(int lvl=0;lvl<levels.size();lvl++){
-        Level* level = levels[lvl];
+        LevelType* level = levels[lvl];
         for(int i=0;i<level->verticles.size();i++){
-            Vertex* v = level->get_permuted_vertex(i);
-            outFile << "\\node[draw, circle] (" <<v  << ") at (" 
+            VertexType* v = level->get_vertex(i+1);
+            if(!v->dummy){
+                outFile << "\\node[draw, circle] (" <<v  << ") at (" 
+                    << i << "," << -lvl
+                    << ") {" << v->label << "};\n";
+            }else{
+                outFile << "\\node[draw, circle,minimum size=0pt, inner sep=0pt] (" <<v  << ") at (" 
                 << i << "," << -lvl
-                << ") {" << v->label << "};\n";
+                << ") {" << "};\n";
+            }
         }
     }
     
     for(int lvl=0;lvl<levels.size();lvl++){
-        Level* level = levels[lvl];
+        LevelType* level = levels[lvl];
         for(int i=0;i<level->verticles.size();i++){
-            Vertex* v = level->get_permuted_vertex(i);
+            VertexType* v = level->get_vertex(i+1);
             for(auto x:v->get_down_neighbors()){
                 outFile << "\\draw (" << v<< ") -- (" 
                 << x<< ");\n";

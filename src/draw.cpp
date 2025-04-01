@@ -1,5 +1,6 @@
 #include "graph.cpp"
 #include "graph_draw.cpp"
+#include "evenify.cpp"
 #include "sat_system.cpp"
 #include <bits/stdc++.h>
 
@@ -17,7 +18,7 @@ int main(int argc, char *argv[]){
     }else{
         g.draw(argv[1]);
     }
-    GraphBase<ExtraLevel,ExtraVertex> d=g.split_verticles();
+    GraphBase<Level,Vertex> d=g.evenify();
     if(argc<3){
         d.draw();
     }else{

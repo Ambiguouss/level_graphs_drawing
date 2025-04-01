@@ -1,27 +1,9 @@
 #include <bits/stdc++.h>
 #pragma once
 using namespace std;
-#include "graph.cpp"
 #include "sat_var.cpp"
+#include "sat_system.hpp"
 
-struct Sat_system{
-    vector<Sat_var*> variables;
-    vector<vector<Vertex*>> index_to_vertex;
-    vector<vector<vector<Sat_var*>>> lvl_ind_ind_to_var;
-    
-    ~Sat_system(){
-        for(auto x:variables){
-            delete x;
-        }
-    }
-
-    
-
-    bool solve();
-    
-    void create(GraphBase<Level,Vertex>*g);
-    
-};
 
 bool Sat_system::solve(){
     for(auto var : variables){
@@ -29,6 +11,11 @@ bool Sat_system::solve(){
         if(!var->process(1))return false;
     }
     return true;
+}
+
+bool Sat_system::less(Vertex* a, Vertex* b){
+    if(a==b)return false;
+    return lvl_ind_ind_to_var[a->level][a->_index][b->_index]->truth==1;
 }
 
 void Sat_system::create(GraphBase<Level,Vertex>* g){

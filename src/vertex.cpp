@@ -7,6 +7,7 @@ struct Vertex{
     vector<Vertex*> down_neighbors;
 
     int _index=-1;//usful only for sat
+    bool dummy=false;
     Vertex(string _label,int _level):label(_label),level(_level){}
 
     void add_down_neighbor(Vertex * v){
