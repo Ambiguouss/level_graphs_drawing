@@ -5,6 +5,7 @@ template <typename LevelType, typename VertexType>
 void GraphBase<LevelType,VertexType>::draw(string filename){
 
     for(auto lvl:levels){
+        cout<<lvl<<'\n';
         cout<<lvl->verticles.size()<<'\n';
     }
 

@@ -9,9 +9,6 @@ GraphBase<LevelType,VertexType> GraphBase<LevelType,VertexType>::evenify(){
     Sat_system sat;
     sat.create(this);
     if(!sat.solve())throw std::invalid_argument("Graph can't be drawn planarly");
-    for(auto v:sat.variables){
-        cout<<v->truth<<'\n';
-    }
 
 
 
@@ -34,7 +31,6 @@ GraphBase<LevelType,VertexType> GraphBase<LevelType,VertexType>::evenify(){
     
     for(int i=0;i<extra_graph.levels.size();i++){
         
-        cout<<"i: "<<i<<'\n';
         ExtraLevel* lvl = extra_graph.levels[i];
         new_index_to_vertex.push_back(vector<Vertex*>(lvl->verticles.size()));
         VertexType* special = lvl->original_vertex;
@@ -43,7 +39,6 @@ GraphBase<LevelType,VertexType> GraphBase<LevelType,VertexType>::evenify(){
         hanani_tutte_graph.levels.push_back(new_lvl);
         vector<pair<VertexType*,int>> before,after;
         for(auto v : lvl->verticles){
-            cout<<"inside\n";
             VertexType* org_v = v->original;
             if(sat.less(org_v,special))before.push_back({org_v,v->_index});
             else if(sat.less(special,org_v))after.push_back({org_v,v->_index});
@@ -72,21 +67,15 @@ GraphBase<LevelType,VertexType> GraphBase<LevelType,VertexType>::evenify(){
     for(int i=0;i<hanani_tutte_graph.levels.size();i++){
         for(int j=0;j<hanani_tutte_graph.levels[i]->verticles.size();j++){
             Vertex* v = hanani_tutte_graph.levels[i]->verticles[j];
-            cout<<i<<' '<<v->_index<<'\n';
             Vertex* old = index_to_vertex[i][v->_index];
             for(auto nei : old->down_neighbors){
                 Vertex* new_nei = new_index_to_vertex[i+1][nei->_index];
                 v->down_neighbors.push_back(new_nei);
+                new_nei->up_neighbors.push_back(v);
             }
         }
     }
 
-    for(auto lvl:hanani_tutte_graph.levels){
-        for(auto v:lvl->verticles){
-            cout<<v->label<<' ';
-        }
-        cout<<'\n';
-    }
 
 
     return hanani_tutte_graph;

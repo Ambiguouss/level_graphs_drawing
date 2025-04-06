@@ -75,17 +75,7 @@ void Sat_system::create(GraphBase<Level,Vertex>* g){
         }
 
     }
-    /*for(auto var: variables){
-        cout<<var->first->level<<' ';
-        cout<<var->first->_index<<' ';
-        cout<<var->second->_index<<": \n";
-        for(auto e: var->equiv){
-            cout<<"equiv ";
-            cout<<e->first->level<<' ';
-            cout<<e->first->_index<<' ';
-            cout<<e->second->_index<<"\n";
-        }
-    }*/
+    
     
 
 }

@@ -1,5 +1,6 @@
 #pragma once
-
+#include "level.cpp"
+#include "vertex.cpp"
 
 template <typename LevelType, typename VertexType>
 struct GraphBase{
@@ -19,6 +20,8 @@ struct GraphBase{
         }
     }
     GraphBase<LevelType,VertexType> evenify();
+    GraphBase<LevelType,VertexType>* copy();
+    vector<GraphBase<LevelType,VertexType>*> split_components();
     void draw(string filename="");
     template <typename L, typename V>
     friend GraphBase<L,V> input_graph();

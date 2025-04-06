@@ -27,10 +27,12 @@ void GraphBase<LevelType,VertexType>::create_edge(int top_level_int,int top_k,in
     VertexType* top_v = top_level->get_vertex(top_k);
     VertexType* bot_v = bot_level->get_vertex(bot_k);
     top_v->add_down_neighbor(bot_v);
+    bot_v->add_up_neighbor(top_v);
 }
 template <typename LevelType, typename VertexType>
 void GraphBase<LevelType,VertexType>::create_edge(VertexType* v1,VertexType* v2){
     v1->add_down_neighbor(v2);
+    v2->add_up_neighbor(v1);
 }
 template<typename LevelType,typename VertexType>
 GraphBase<LevelType,VertexType> input_graph(){
@@ -38,15 +40,14 @@ GraphBase<LevelType,VertexType> input_graph(){
     int number_of_lvl;
     cin>>number_of_lvl;
     for(int i=0;i<number_of_lvl;i++){
-        g.levels.push_back(new Level());
+        g.create_level();
     }
     for(int l=0;l<g.levels.size();l++){
-        LevelType* lvl = g.levels[l];
+        LevelType* lvl = g.get_level(l);
         int no_vertex;
         cin>>no_vertex;
         for(int i=0;i<no_vertex;i++){
-            lvl->verticles.push_back(new Vertex(to_string(i+1),l));
-            lvl->permutation.push_back(i);
+            lvl->add_vertex(new Vertex(to_string(i+1),l));
         }
     }
     for(int i=0;i<number_of_lvl-1;i++){
@@ -83,7 +84,6 @@ GraphBase<ExtraLevel,ExtraVertex> GraphBase<LevelType,VertexType>::split_verticl
                 ExtraVertex* edge_vertex = new ExtraVertex(prev->label,lvl_cnt,to_be_origin);
                 new_graph.create_edge(prev,edge_vertex);
                 new_lvl->add_vertex(edge_vertex);
-                cout<<"done ";
                 prev = edge_vertex;
                 ++it;
             }
@@ -92,11 +92,10 @@ GraphBase<ExtraLevel,ExtraVertex> GraphBase<LevelType,VertexType>::split_verticl
     };
     
     for(auto lvl:levels){
-        cout<<"a\n";
         for(int i=0;i<lvl->verticles.size();i++){
             
             auto vertex=lvl->verticles[i];
-            cout<<vertex->label<<' ';
+            
 
             ExtraLevel* new_lvl = new ExtraLevel(lvl,vertex);
             new_graph.levels.push_back(new_lvl);
@@ -126,18 +125,136 @@ GraphBase<ExtraLevel,ExtraVertex> GraphBase<LevelType,VertexType>::split_verticl
         }
     }
 
-    for(auto lvl:new_graph.levels){
-        cout<<lvl->verticles.size()<<'\n';
-    }
-
-    for(auto lvl:new_graph.levels){
-        for(int i=0;i<lvl->verticles.size();i++){
-            cout<<lvl->get_vertex(i+1)->label<<' ';
-        }
-        cout<<'\n';
-    }
 
     return new_graph;
 }
 
 
+template <typename LevelType, typename VertexType>
+GraphBase<LevelType,VertexType>* GraphBase<LevelType,VertexType>::copy(){
+    GraphBase<LevelType,VertexType>* result = new GraphBase<LevelType,VertexType>();
+    map<VertexType*,VertexType*>new_to_old;
+    map<VertexType*,VertexType*> old_to_new;
+    for(int i=0;i<levels.size();i++){
+        LevelType* lvl = levels[i];
+        LevelType* new_lvl = new LevelType();
+        result->levels.push_back(new_lvl);
+        for(auto v : lvl->verticles){
+            VertexType* new_ver = new VertexType(v->label,v->level);
+            new_lvl->verticles.push_back(new_ver);
+            old_to_new[v]=new_ver;
+            new_to_old[new_ver]=v;
+        }
+        
+    }
+
+    for(int i=0;i<result->levels.size();i++){
+        for(int j=0;j<result->levels[i]->verticles.size();j++){
+            VertexType* v = result->levels[i]->verticles[j];
+            VertexType* old = new_to_old[v];
+            for(auto nei : old->down_neighbors){
+                Vertex* new_nei = old_to_new[nei];
+                v->down_neighbors.push_back(new_nei);
+                new_nei->up_neighbors.push_back(v);
+            }
+        }
+    }
+    return result;
+}
+
+template <typename LevelType, typename VertexType>
+vector<GraphBase<LevelType,VertexType>*> GraphBase<LevelType,VertexType>::split_components(){
+    vector<GraphBase<LevelType,VertexType>*> result;
+
+    map<Vertex*,int> visited;
+    function<void(Vertex*,int,Vertex*)> dfs = [&](Vertex* v,int lvl,Vertex* par){
+        if(visited[v]!=0)return;
+        visited[v]=result.size();
+        //Vertex* new_ver= new Vertex(v->label,v->level);
+        //new_ver->dummy=v->dummy;
+        //result[result.size()-1]->get_level(lvl)->verticles.push_back(new_ver);
+        /*if(par!=nullptr){
+            if(v->level<par->level){
+                result[result.size()-1]->create_edge(new_ver,new_par);
+            }else{
+                result[result.size()-1]->create_edge(new_par,new_ver);
+            }
+        }*/
+        for(auto x:v->down_neighbors){
+            dfs(x,lvl+1,v);
+        }
+        for(auto x:v->up_neighbors){
+            dfs(x,lvl-1,v);
+        }
+
+    };
+
+    for(int i=0;i<levels.size();i++){
+        for(auto v:levels[i]->verticles){
+            if(!visited[v]){
+                GraphBase<LevelType,VertexType>* g= new GraphBase<LevelType,VertexType>();
+                result.push_back(g);
+                dfs(v,i,nullptr);
+                for(int j=0;j<levels.size();j++){
+                    LevelType* new_lvl = new LevelType();
+                    g->levels.push_back(new_lvl);
+                }
+            }
+        }
+    }
+    map<VertexType*,VertexType*>new_to_old;
+    map<VertexType*,VertexType*> old_to_new;
+
+    for(int i=0;i<levels.size();i++){
+        for(auto v:levels[i]->verticles){
+            Vertex* new_ver= new Vertex(v->label,v->level);
+            new_ver->dummy=v->dummy;
+            result[visited[v]-1]->levels[i]->verticles.push_back(new_ver);
+            new_to_old[new_ver]=v;
+            old_to_new[v]=new_ver;
+        }
+    }
+
+    for(int i=0;i<levels.size();i++){
+        for(int j=0;j<levels[i]->verticles.size();j++){
+            VertexType* v = levels[i]->verticles[j];
+            VertexType* new_v = old_to_new[v];
+            for(auto nei : v->down_neighbors){
+                Vertex* new_nei = old_to_new[nei];
+                new_v->down_neighbors.push_back(new_nei);
+                new_nei->up_neighbors.push_back(new_v);
+            }
+        }
+    }
+
+
+    return result;
+
+    /*map<VertexType*,VertexType*>new_to_old;
+    map<VertexType*,VertexType*> old_to_new;
+    for(int i=0;i<levels.size();i++){
+        LevelType* lvl = levels[i];
+        LevelType* new_lvl = new LevelType();
+        result.levels.push_back(new_lvl);
+        for(auto v : lvl->verticles){
+            VertexType* new_ver = new VertexType(v->label,v->level);
+            new_lvl->verticles.push_back(new_ver);
+            old_to_new[v]=new_ver;
+            new_to_old[new_ver]=v;
+        }
+        
+    }
+
+    for(int i=0;i<result.levels.size();i++){
+        for(int j=0;j<result.levels[i]->verticles.size();j++){
+            VertexType* v = result.levels[i]->verticles[j];
+            VertexType* old = new_to_old[v];
+            for(auto nei : old->down_neighbors){
+                Vertex* new_nei = old_to_new[nei];
+                v->down_neighbors.push_back(new_nei);
+                new_nei->up_neighbors.push_back(v);
+            }
+        }
+    }*/
+    return result;
+}

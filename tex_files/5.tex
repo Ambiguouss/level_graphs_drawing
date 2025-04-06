@@ -1,0 +1,32 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{adjustbox}
+\begin{document}
+\adjustbox{max size={\textwidth}{\textheight}}{%
+\begin{tikzpicture}[]
+\node[draw, circle] (0x607000000100) at (0,0) {1};
+\node[draw, circle] (0x607000000170) at (1,0) {2};
+\node[draw, circle] (0x6070000001e0) at (2,0) {3};
+\node[draw, circle] (0x607000000250) at (3,0) {4};
+\node[draw, circle] (0x6070000002c0) at (4,0) {5};
+\node[draw, circle] (0x607000000330) at (0,-1) {1};
+\node[draw, circle] (0x6070000003a0) at (1,-1) {2};
+\node[draw, circle] (0x607000000410) at (2,-1) {3};
+\node[draw, circle] (0x607000000480) at (3,-1) {4};
+\node[draw, circle] (0x6070000004f0) at (4,-1) {5};
+\node[draw, circle] (0x607000000560) at (0,-2) {1};
+\node[draw, circle] (0x6070000005d0) at (1,-2) {2};
+\draw (0x607000000100) -- (0x6070000003a0);
+\draw (0x607000000100) -- (0x607000000330);
+\draw (0x607000000170) -- (0x6070000004f0);
+\draw (0x6070000001e0) -- (0x607000000410);
+\draw (0x607000000250) -- (0x6070000003a0);
+\draw (0x607000000250) -- (0x607000000480);
+\draw (0x6070000002c0) -- (0x607000000330);
+\draw (0x6070000003a0) -- (0x6070000005d0);
+\draw (0x607000000410) -- (0x6070000005d0);
+\draw (0x607000000480) -- (0x607000000560);
+\draw (0x6070000004f0) -- (0x607000000560);
+\end{tikzpicture}%
+}
+\end{document}
